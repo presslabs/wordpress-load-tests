@@ -6,6 +6,14 @@ image:
 influxdb_url: http://storage-influxdb.default.svc.cluster.local:8086/k6
 
 scenario:
-  url: https://test.loadimpact.com
-  vus: "50"
+  url: http://test.loadimpact.com/
+  vus: "5000"
   duration: 300s
+
+# resources:
+#   requests:
+#     cpu: "14"
+#     memory: "90Gi"
+#   limits:
+#     cpu: "15"
+#     memory: "100Gi"
