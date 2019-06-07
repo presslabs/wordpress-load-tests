@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "k6.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "k6.name" . }}
+    helm.sh/chart: {{ include "k6.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["run", "--out", "influxdb={{ .Values.influxdb_url }}", "/app/main.js"]
+          env:
+            - name: SCENARIO_URL
+              value: "{{ .Values.scenario.url }}"
+            - name: SCENARIO_VUs
+              value: "{{ .Values.scenario.vus }}"
+            - name: SCENARIO_DURATION
+              value: "{{ .Values.scenario.duration }}"
