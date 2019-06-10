@@ -23,6 +23,8 @@ spec:
               value: "{{ .Values.scenario.vus }}"
             - name: SCENARIO_DURATION
               value: "{{ .Values.scenario.duration }}"
+            - name: SCENARIO_CACHE_BYPASS_PARAM
+              value: "{{ .Values.scenario.cache_bypass_param }}"
 {{- if .Values.resources }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}

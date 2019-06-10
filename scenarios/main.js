@@ -3,6 +3,7 @@ import { sleep } from "k6";
 
 import * as config from "./config.js";
 import base from "./base.js";
+import bypass from "./bypass.js";
 
 
 export let options = {
@@ -12,4 +13,5 @@ export let options = {
 
 export default function() {
     base();
+    bypass();
 };
