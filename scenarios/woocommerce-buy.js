@@ -5,13 +5,18 @@ import { check } from "k6";
 import * as config from "./config.js";
 
 
+export let options = {
+  vus: config.VUs,
+  duration: config.DURATION,
+};
+
+
 export default function() {
     let res = http.get(config.BASE_URL + config.PRODUCT_URL, {
         tags: {
             my_tag: "PRODUCT-VIEW"
         }
     });
-
     check(res, {
         "status is 200": (r) => r.status === 200
     });
@@ -26,7 +31,6 @@ export default function() {
             }
         }
     );
-
     check(res, {
         "add to cart - 200": (r) => r.status === 200,
         "has cookie 'woocommerce_cart_hash'": (r) => r.cookies.woocommerce_cart_hash.length > 0,
@@ -48,10 +52,9 @@ export default function() {
     check(res, {
         "checkout - 200": (r) => r.status === 200,
     });
+
     const doc = parseHTML(res.body);
     const nonce = doc.find("#woocommerce-process-checkout-nonce").val();
-
-    res = http.get("http://requestbin.fullcontact.com/108tzy31", {cookies, tag: {mytag: "yey"}})
 
     const payload = {
         "billing_first_name": "Vlad",
@@ -89,7 +92,6 @@ export default function() {
             }
         }
     );
-
     check(res, {
         "buy - 200": (r) => r.status === 200,
     });

@@ -15,7 +15,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["run", "--out", "influxdb={{ .Values.influxdb_url }}", "/app/{{ .Value.scenario.name }}.js"]
+          args: ["run", "--out", "influxdb={{ .Values.influxdb_url }}", "/app/{{ .Values.scenario.name }}.js"]
           env:
             - name: SCENARIO_URL
               value: "{{ .Values.scenario.url }}"
