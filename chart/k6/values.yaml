@@ -6,11 +6,14 @@ image:
 influxdb_url: http://storage-influxdb.default.svc.cluster.local:8086/k6
 
 scenario:
-  url: http://test.loadimpact.com/
+  name: main
+  url: http://dev-stack.trypl.com/
   vus: "500"
   duration: 300s
-  cache_bypass_param: ?nocache
-  name: main
+  # cache_bypass_param: ?nocache
+  # product_url: /product/fiery-valiant-moth-of-painting/
+  # product_id: 5177
+  # checkout_url: /checkout/
 
 # resources:
 #   requests:

@@ -23,8 +23,22 @@ spec:
               value: "{{ .Values.scenario.vus }}"
             - name: SCENARIO_DURATION
               value: "{{ .Values.scenario.duration }}"
+{{- if .Values.scenario.cache_bypass_param }}
             - name: SCENARIO_CACHE_BYPASS_PARAM
               value: "{{ .Values.scenario.cache_bypass_param }}"
+{{- end }}
+{{- if .Values.scenario.product_url }}
+            - name: SCENARIO_PRODUCT_URL
+              value: "{{ .Values.scenario.product_url }}"
+{{- end }}
+{{- if .Values.scenario.product_id }}
+            - name: SCENARIO_PRODUCT_ID
+              value: "{{ .Values.scenario.product_id }}"
+{{- end }}
+{{- if .Values.scenario.checkout_url }}
+            - name: SCENARIO_CHECKOUT_URL
+              value: "{{ .Values.scenario.checkout_url }}"
+{{- end }}
 {{- if .Values.resources }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
