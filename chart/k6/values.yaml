@@ -10,6 +10,7 @@ scenario:
   vus: "500"
   duration: 300s
   cache_bypass_param: ?nocache
+  name: main
 
 # resources:
 #   requests:
