@@ -35,3 +35,12 @@ If you want to run the tests via docker:
 ```
 docker-compose run k6
 ```
+
+#### Woocommerce tests
+In order to run the woocommerce tests, you'll need to enable purchases without an account and to define
+```
+SCENARIO_PRODUCT_URL: relative URL to a product
+SCENARIO_PRODUCT_ID: woocommerce product's ID
+SCENARIO_CHECKOUT_URL: relative URL to the current checkout page
+```
+Currently tested on Storefront.
