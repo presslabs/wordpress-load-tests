@@ -10,6 +10,7 @@ scenario:
   url: http://dev-stack.trypl.com/
   vus: "500"
   duration: 300s
+  # tag: simpel-test
   # cache_bypass_param: ?nocache
   # product_url: /product/fiery-valiant-moth-of-painting/
   # product_id: 5177

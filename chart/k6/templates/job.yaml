@@ -23,6 +23,10 @@ spec:
               value: "{{ .Values.scenario.vus }}"
             - name: SCENARIO_DURATION
               value: "{{ .Values.scenario.duration }}"
+{{- if .Values.scenario.tag }}
+            - name: SCENARIO_TAG
+              value: "{{ .Values.scenario.tag }}"
+{{- end }}
 {{- if .Values.scenario.cache_bypass_param }}
             - name: SCENARIO_CACHE_BYPASS_PARAM
               value: "{{ .Values.scenario.cache_bypass_param }}"

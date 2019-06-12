@@ -6,8 +6,11 @@ import * as config from "./config.js";
 
 
 export let options = {
-  vus: config.VUs,
-  duration: config.DURATION,
+    vus: config.VUs,
+    duration: config.DURATION,
+    tags: {
+        test: config.TAG
+    }
 };
 
 
@@ -81,7 +84,7 @@ export default function() {
         "shipping_method[0]": "flat_rate:1",
         "payment_method": "bacs",
         "woocommerce-process-checkout-nonce": nonce,
-        "_wp_http_referer": "/checkout/"
+        "_wp_http_referer": config.CHECKOUT_URL
     }
 
     res = http.post(config.BASE_URL + "/?wc-ajax=checkout", payload,
