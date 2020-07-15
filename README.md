@@ -1,46 +1,69 @@
-# wordpress-load-tests
+<div align="center">
+  
+  ![banner](assets/ts-js-k6.png)
 
-Load tests for Wordpress 🧪
+# Template to use TypeScript with k6
 
-#### K8s deployment
-If you don't want to hammer your local machine, or you want to have tests as reproductible as possible, you can use Kubernetes.
+![.github/workflows/push.yml](https://github.com/k6io/template-typescript/workflows/.github/workflows/push.yml/badge.svg?branch=master)
 
-```
-cd chart
-helm install --name storage storage/
-helm install --name k6 k6/
+</div>
+
+This repository provides a scaffolding project to start using TypeScript in your k6 scripts.
+
+## Rationale
+
+While JavaScript is great for a myriad of reasons, one area where it fall short is type safety and developer ergonomics. It's perfectly possible to write JavaScript code that will look OK and behave OK until a certain condition forces the executor into a faulty branch.
+
+While it, of course, still is possible to shoot yourself in the foot with TypeScript as well, it's significantly harder. Without adding much overhead, TypeScript will:
+
+- Improve the ability to safely refactor your code.
+- Improve readability and maintainablity.
+- Allow you to drop a lot of the defensive code previously needed to make sure consumers are calling functions properly.
+
+
+## Prerequisites
+
+- [k6](https://k6.io/docs/getting-started/installation)
+- [NodeJS](https://nodejs.org/en/download/)
+- [Yarn](https://yarnpkg.com/getting-started/install) (optional)
+
+## Installation
+
+**Creating a project from the `template-typescript` template**
+
+To generate a TypeScript project that includes the dependencies and initial configuration, navigate to the [template-typescript](https://github.com/k6io/template-typescript) page and click **Use this template**.
+
+  ![](assets/use-this-template-button.png)
+
+
+**Install dependencies**
+
+Clone the generated repository on your local machine, move to the project root folder and install the dependencies defined in [`package.json`](./package.json)
+
+```bash
+$ yarn install
 ```
 
-This will deploy influxdb and grafana. In order to access grafana, you will need the admin password from the `storage-grafana`
-secret.
-```
-kubectl get secret storage-grafana -o yaml
+## Running the test
+
+To run a test written in TypeScript, we first have to transpile the TypeScript code into JavaScript and bundle the project
+
+```bash
+$ yarn webpack
 ```
 
-Next, just forward grafana's 3000 port
-```
-kubectl port-forward $(kubectl get pod | grep grafana | awk '{print $1}') 3000:3000
+This command creates the final test files to the `./dist` folder.
+
+Once that is done, we can run our script the same way we usually do, for instance:
+
+```bash
+$ k6 run dist/test1.js
 ```
 
-#### Local testing
-The recomended way of testing is to run the containers dedicated for storage and visualization (grafana & influx) via
-docker-compose and to test with your local machine (since via docker you can have some limitations, like ulimits).
+### Transpiling and Bundling
 
-```
-docker-compose up -d influxdb grafana
-SCENARIO_URL=https://test.loadimpact.com/ SCENARIO_VUS=1000 SCENARIO_DURATION=300s k6 run --out influxdb=http://localhost:8086/k6 tests/main.js
-```
+By default, k6 can only run ES5.1 JavaScript code. To use TypeScript, we have to set up a bundler that converts TypeScript to JavaScript code. 
 
-If you want to run the tests via docker:
-```
-docker-compose run k6
-```
+This project uses `Babel` and `Webpack` to bundle the different files - using the configuration of the [`webpack.config.js`](./webpack.config.js) file.
 
-#### Woocommerce tests
-In order to run the woocommerce tests, you'll need to enable purchases without an account and to define
-```
-SCENARIO_PRODUCT_URL: relative URL to a product
-SCENARIO_PRODUCT_ID: woocommerce product's ID
-SCENARIO_CHECKOUT_URL: relative URL to the current checkout page
-```
-Currently tested on Storefront.
+If you want to learn more, check out [Bundling node modules in k6](https://k6.io/docs/using-k6/modules#bundling-node-modules).
