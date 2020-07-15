@@ -22,5 +22,8 @@
     "emitDecoratorMetadata": true,
 
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "src"
+  ]
 }

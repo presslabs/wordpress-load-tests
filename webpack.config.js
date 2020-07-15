@@ -4,10 +4,10 @@ module.exports = {
     mode: 'development',
     context: path.join(__dirname, 'src'),
     entry: {
-        order: './order.ts'
+        'woocommerce-order': './tests/woocommerce-order.ts'
     },
     output: {
-        path: path.join(__dirname, 'build'),
+        path: path.join(__dirname, 'tests'),
         libraryTarget: 'commonjs',
         filename: '[name].js'
     },
