@@ -14,9 +14,8 @@ import {
 } from '../woocommerce/helpers'
 
 export const options: Options = {
-    vus        : __ENV.VUS ? parseInt(__ENV.VUS) : 10,
-    duration   : __ENV.DURATION || '20s',
-    iterations : __ENV.ITERATIONS ? parseInt(__ENV.ITERATIONS) : undefined
+    vus      : __ENV.K6_VUS ? parseInt(__ENV.K6_VUS) : 5,
+    duration : __ENV.K6_DURATION || '60s'
 }
 
 const { products, categories } = loadSeedData()
