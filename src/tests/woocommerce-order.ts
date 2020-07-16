@@ -18,7 +18,7 @@ export const options: Options = {
     duration : __ENV.K6_DURATION || '60s'
 }
 
-const { products, categories } = loadSeedData()
+const { products, categories } = loadSeedData('../sample_products.csv')
 
 export default () => {
     if (isEmpty(products) || isEmpty(categories)) {

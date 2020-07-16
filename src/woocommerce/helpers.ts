@@ -26,7 +26,7 @@ export type Product = {
 
 function isValidProduct(productData: object) {
     return (
-        !isEmpty(get(productData, '\ufeffID'))
+        !isEmpty(get(productData, 'ID'))
         && get(productData, 'Type') === 'simple'
         && get(productData, 'Published') === '1'
         && get(productData, 'In stock?') === '1'
@@ -35,15 +35,15 @@ function isValidProduct(productData: object) {
 
 function toProduct(productData: object): Product {
     return {
-        id: parseInt(get(productData, '\ufeffID')),
+        id: parseInt(get(productData, 'ID')),
         sku: get(productData, 'SKU'),
         name: get(productData, 'Name'),
         categories: map(split(get(productData, 'Categories'), ' > '), toLower)
     }
 }
 
-export function loadSeedData() {
-    const parsedData: ParseResult<object> = papaparse.parse(open('../sample_products.csv'), { header: true })
+export function loadSeedData(filePath: string) {
+    const parsedData: ParseResult<object> = papaparse.parse(open(filePath), { header: true })
     const filteredData = filter(parsedData.data, isValidProduct)
     const products = map(filteredData, toProduct)
     const categories = uniq(flatMap(products, 'categories'))
