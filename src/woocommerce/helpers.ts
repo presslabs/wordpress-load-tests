@@ -12,7 +12,7 @@ import {
 } from 'lodash'
 
 
-const SHOP_URL = __ENV.SHOP_URL || 'http://localhost:8080/'
+const SITE_URL = __ENV.SITE_URL || 'http://localhost:8080/'
 
 //
 //  SAMPLE DATA
@@ -84,30 +84,30 @@ export function hasElementWithText(selector: string, text: string): (response: R
 //
 //  URL BUILDERS
 
-export function shopURL(path: string) {
+export function siteURL(path: string) {
     const pathname = path[0] === '/' ? path : `/${path}`
-    const baseURL = replace(SHOP_URL, /\/$/, '')
+    const baseURL = replace(SITE_URL, /\/$/, '')
     return `${baseURL}${pathname}`
 }
 
 export function productURL(product: Product) {
-    return shopURL(`/product/${slug(product.name)}`)
+    return siteURL(`/product/${slug(product.name)}`)
 }
 
 export function categoryURL(category: string) {
-    return shopURL(`/product-category/${category}`)
+    return siteURL(`/product-category/${category}`)
 }
 
 export function cartURL() {
-    return shopURL('/cart')
+    return siteURL('/cart')
 }
 
 export function checkoutURL() {
-    return shopURL('/checkout')
+    return siteURL('/checkout')
 }
 
 export function ajaxURL(method: string) {
-    return shopURL(`/?wc-ajax=${method}`)
+    return siteURL(`/?wc-ajax=${method}`)
 }
 
 
