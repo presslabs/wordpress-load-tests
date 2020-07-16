@@ -1,4 +1,4 @@
-import { check, sleep } from 'k6'
+import { check } from 'k6'
 import http, { Response } from 'k6/http'
 import { parseHTML } from 'k6/html'
 
@@ -119,28 +119,24 @@ export function ajaxURL(method: string) {
 export function openProductPage(product: Product): Response {
     const response = http.get(productURL(product))
     check(response, { isOK })
-    sleep(1)
     return response
 }
 
 export function openCategoryPage(category: string): Response {
     const response = http.get(categoryURL(category))
     check(response, { isOK })
-    sleep(1)
     return response
 }
 
 export function openCart(): Response {
     const response = http.get(cartURL())
     check(response, { isOK })
-    sleep(1)
     return response
 }
 
 export function openCheckout(): Response {
     const response = http.get(checkoutURL())
     check(response, { isOK })
-    sleep(1)
     return response
 }
 
@@ -154,8 +150,6 @@ export function addToCart(product: Product): Response {
     const hasCartCookie = hasCookie('woocommerce_cart_hash')
 
     check(response, { isOK, isAddedToCart, hasCartCookie })
-
-    sleep(1)
     return response
 }
 
@@ -177,6 +171,5 @@ export function placeOrder(): Response {
     const isOrderSuccessfull = hasElementWithText('h1.entry-title', 'Order received')
 
     check(response, { isOK, isOrderSuccessfull })
-    sleep(3)
     return response
 }
