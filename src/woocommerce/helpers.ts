@@ -1,16 +1,13 @@
-import { check } from 'k6'
+import { check, fail } from 'k6'
 import http, { Response } from 'k6/http'
 import { parseHTML } from 'k6/html'
-
-import papaparse, { ParseResult } from 'papaparse'
-import slug from 'slugify'
+import { b64encode } from 'k6/encoding'
 
 import {
-    map, flatMap, filter, get, uniq, parseInt,
-    replace, split, trim, toString, toLower,
+    flatMap, filter, join, uniq,
+    replace, trim, toString,
     has, isEmpty, isString
 } from 'lodash'
-
 
 const SITE_URL = __ENV.SITE_URL || 'http://localhost:8080/'
 
@@ -21,31 +18,52 @@ export type Product = {
     id: number
     sku: string
     name: string
-    categories: string[]
+    permalink: string
+    type: 'simple' | 'grouped' | 'external' | 'variable'
+    status: 'draft' | 'pending' | 'private' | 'publish'
+    catalog_visibility: 'visible' | 'search' | 'hidden'
+    stock_status: 'instock' | 'outofstock' | 'onbackorder'
+    purchasable: boolean
+    downloadable: boolean
+    manage_stock: boolean
+    stock_quantity: number
+    categories: Category[]
 }
 
-function isValidProduct(productData: object) {
-    return (
-        !isEmpty(get(productData, 'ID'))
-        && get(productData, 'Type') === 'simple'
-        && get(productData, 'Published') === '1'
-        && get(productData, 'In stock?') === '1'
+export type Category = {
+    id: number
+    name: string
+    slug: string
+}
+
+export type SeedData = {
+    products: Product[],
+    categories: Category[]
+}
+
+function isValidProduct(product: Product) {
+    const isValid = (
+        !isEmpty(product.permalink)
+        && product.type === 'simple'
+        && product.catalog_visibility === 'visible'
+        && (product.manage_stock === false || (product.stock_status === 'instock' && product.stock_quantity > 0))
+        && product.purchasable === true
+        && product.downloadable === false
     )
+    return isValid
 }
 
-function toProduct(productData: object): Product {
-    return {
-        id: parseInt(get(productData, 'ID')),
-        sku: get(productData, 'SKU'),
-        name: get(productData, 'Name'),
-        categories: map(split(get(productData, 'Categories'), ' > '), toLower)
+export function loadSeedData(): SeedData {
+    const response = wooAPIFetch('products')
+    if (!check(response, { isOK })) {
+        return {
+            products: [],
+            categories: []
+        }
     }
-}
 
-export function loadSeedData(filePath: string) {
-    const parsedData: ParseResult<object> = papaparse.parse(open(filePath), { header: true })
-    const filteredData = filter(parsedData.data, isValidProduct)
-    const products = map(filteredData, toProduct)
+    const parsedData = JSON.parse(toString(response.body))
+    const products = filter(parsedData, isValidProduct)
     const categories = uniq(flatMap(products, 'categories'))
 
     return {
@@ -91,11 +109,11 @@ export function siteURL(path: string) {
 }
 
 export function productURL(product: Product) {
-    return siteURL(`/product/${slug(product.name)}`)
+    return product.permalink
 }
 
-export function categoryURL(category: string) {
-    return siteURL(`/product-category/${category}`)
+export function categoryURL(category: Category) {
+    return siteURL(`/product-category/${category.slug}`)
 }
 
 export function cartURL() {
@@ -110,11 +128,31 @@ export function ajaxURL(method: string) {
     return siteURL(`/?wc-ajax=${method}`)
 }
 
+export function APIURL(endpoint: string, version: number = 3) {
+    return siteURL(`/wp-json/wc/v${version}/${endpoint}`)
+}
+
 
 
 
 //
 //  NAVIGATION
+
+export function wooAPIFetch(endpoint: string): Response {
+    if (isEmpty(__ENV.API_KEY) || isEmpty(__ENV.API_SECRET)) {
+        fail('Missing API_KEY and/or API_SECRET')
+    }
+
+    const credentials = join([__ENV.API_KEY, __ENV.API_SECRET], ':')
+    const response = http.get(APIURL(endpoint), {
+        headers: {
+            Authorization: `Basic ${b64encode(credentials)}`
+        }
+    })
+
+    check(response, { isOK })
+    return response
+}
 
 export function openProductPage(product: Product): Response {
     const response = http.get(productURL(product))
@@ -122,7 +160,7 @@ export function openProductPage(product: Product): Response {
     return response
 }
 
-export function openCategoryPage(category: string): Response {
+export function openCategoryPage(category: Category): Response {
     const response = http.get(categoryURL(category))
     check(response, { isOK })
     return response
@@ -149,7 +187,11 @@ export function addToCart(product: Product): Response {
     const isAddedToCart = hasElementWithText('div.woocommerce-message', `View cart “${product.name}” has been added to your cart.`)
     const hasCartCookie = hasCookie('woocommerce_cart_hash')
 
-    check(response, { isOK, isAddedToCart, hasCartCookie })
+    const added = check(response, { isOK, isAddedToCart, hasCartCookie })
+
+    if (!added) {
+        fail(`Failed to add "${product.name}" to cart!`)
+    }
     return response
 }
 
@@ -164,7 +206,7 @@ export function placeOrder(): Response {
             'billing_city': 'City',
             'billing_postcode': '300000',
             'billing_phone': '0740000000',
-            'billing_email': 'jd@not-a-valid-mail.com'
+            'billing_email': `jd_vu${__VU}_iter${__ITER}@not-a-valid-mail.com`
         }
     })
 
