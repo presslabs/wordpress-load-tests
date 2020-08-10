@@ -1,15 +1,16 @@
-import { check, fail } from 'k6'
+import { check, fail, sleep } from 'k6'
 import http, { Response } from 'k6/http'
 import { parseHTML } from 'k6/html'
 import { b64encode } from 'k6/encoding'
 
 import {
     flatMap, filter, join, uniq,
-    replace, trim, toString,
+    parseInt, replace, trim, toString,
     has, isEmpty, isString
 } from 'lodash'
 
 const SITE_URL = __ENV.SITE_URL || 'http://localhost:8080/'
+const STEP_SLEEP = __ENV.STEP_SLEEP_DURATION ? parseInt(__ENV.STEP_SLEEP_DURATION) : 1
 
 //
 //  SAMPLE DATA
@@ -70,6 +71,10 @@ export function loadSeedData(): SeedData {
         products,
         categories
     }
+}
+
+function wait() {
+    sleep(STEP_SLEEP)
 }
 
 
@@ -149,7 +154,6 @@ export function wooAPIFetch(endpoint: string): Response {
             Authorization: `Basic ${b64encode(credentials)}`
         }
     })
-
     check(response, { isOK })
     return response
 }
@@ -157,24 +161,28 @@ export function wooAPIFetch(endpoint: string): Response {
 export function openProductPage(product: Product): Response {
     const response = http.get(productURL(product))
     check(response, { isOK })
+    wait()
     return response
 }
 
 export function openCategoryPage(category: Category): Response {
     const response = http.get(categoryURL(category))
     check(response, { isOK })
+    wait()
     return response
 }
 
 export function openCart(): Response {
     const response = http.get(cartURL())
     check(response, { isOK })
+    wait()
     return response
 }
 
 export function openCheckout(): Response {
     const response = http.get(checkoutURL())
     check(response, { isOK })
+    wait()
     return response
 }
 
@@ -192,6 +200,8 @@ export function addToCart(product: Product): Response {
     if (!added) {
         fail(`Failed to add "${product.name}" to cart!`)
     }
+
+    wait()
     return response
 }
 
@@ -213,5 +223,6 @@ export function placeOrder(): Response {
     const isOrderSuccessfull = hasElementWithText('h1.entry-title', 'Order received')
 
     check(response, { isOK, isOrderSuccessfull })
+    wait()
     return response
 }
