@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "k6.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "k6.name" . }}
+    helm.sh/chart: {{ include "k6.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["run", "--out", "influxdb={{ .Values.influxdb_url }}", "{{ .Values.env.test_file_path }}"]
+          env:
+            - name: SITE_URL
+              value: "{{ .Values.env.site_url }}"
+            - name: WOO_API_KEY
+              value: "{{ .Values.env.woo_api_key }}"
+            - name: WOO_API_SECRET
+              value: "{{ .Values.env.woo_api_secret }}"
+{{- if .Values.env.k6_stages }}
+            - name: K6_STAGES
+              value: "{{ .Values.env.k6_stages }}"
+{{- else }}
+            - name: K6_DURATION
+              value: "{{ .Values.env.k6_duration }}"
+            - name: K6_ITERATIONS
+              value: "{{ .Values.env.k6_iterations }}"
+            - name: K6_VUS
+              value: "{{ .Values.env.k6_vus }}"
+{{- end }}
+
+{{- if .Values.resources }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{- end }}
