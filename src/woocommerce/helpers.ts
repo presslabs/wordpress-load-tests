@@ -144,11 +144,11 @@ export function APIURL(endpoint: string, version: number = 3) {
 //  NAVIGATION
 
 export function wooAPIFetch(endpoint: string): Response {
-    if (isEmpty(__ENV.API_KEY) || isEmpty(__ENV.API_SECRET)) {
-        fail('Missing API_KEY and/or API_SECRET')
+    if (isEmpty(__ENV.WOO_API_KEY) || isEmpty(__ENV.WOO_API_SECRET)) {
+        fail('Missing WOO_API_KEY and/or WOO_API_KEY')
     }
 
-    const credentials = join([__ENV.API_KEY, __ENV.API_SECRET], ':')
+    const credentials = join([__ENV.WOO_API_KEY, __ENV.WOO_API_SECRET], ':')
     const response = http.get(APIURL(endpoint), {
         headers: {
             Authorization: `Basic ${b64encode(credentials)}`
