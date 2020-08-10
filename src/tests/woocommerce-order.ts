@@ -17,8 +17,9 @@ import {
 
 
 export const options: Options = __ENV.K6_STAGES ? {} : {
-    vus      : __ENV.K6_VUS ? parseInt(__ENV.K6_VUS) : 5,
-    duration : __ENV.K6_DURATION || '60s'
+    vus        : __ENV.K6_VUS ? parseInt(__ENV.K6_VUS) : 5,
+    duration   : __ENV.K6_DURATION || '60s',
+    iterations : __ENV.K6_ITERATIONS ? parseInt(__ENV.K6_ITERATIONS) : undefined
 }
 
 
@@ -40,11 +41,14 @@ export default (data: SeedData) => {
     openCategoryPage(sample(categories) as Category)
     openProductPage(sample(products) as Product)
     openProductPage(sample(products) as Product)
+
     openCategoryPage(sample(categories) as Category)
     openCategoryPage(sample(categories) as Category)
     openProductPage(sample(products) as Product)
+
     openCategoryPage(sample(categories) as Category)
     openProductPage(sample(products) as Product)
+
     const product1 = sample(products) as Product
     openProductPage(product1)
     addToCart(product1)
