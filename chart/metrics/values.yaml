@@ -11,7 +11,7 @@ grafana:
       datasources:
         - name: influxdb
           type: influxdb
-          url: http://storage-influxdb.default.svc.cluster.local:8086/
+          url: http://metrics-influxdb.default.svc.cluster.local:8086/
           database: k6
           access: proxy
           isDefault: true
