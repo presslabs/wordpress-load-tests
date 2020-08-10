@@ -1,0 +1,27 @@
+image:
+  repository: quay.io/presslabs/wordpress-load-tests
+  tag: latest
+  pullPolicy: Always
+
+influxdb_url: http://storage-influxdb.default.svc.cluster.local:8086/k6
+
+env:
+  site_url: "http://dev-stack.trypl.com/"
+  woo_api_key: ""
+  woo_api_secret: ""
+  k6_stages: "1m:50,1m:100,5m:250,10m:300,5m:500,10m:100,5m:50"
+  k6_vus: 5
+  k6_duration: 60s
+  k6_iterations: 5
+  test_file_path: "tests/woocommerce-order.js"
+
+  # checkout_url: /checkout/
+  # cart_url: /cart/
+
+# resources:
+#   requests:
+#     cpu: "14"
+#     memory: "90Gi"
+#   limits:
+#     cpu: "15"
+#     memory: "100Gi"
